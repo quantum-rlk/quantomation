@@ -1,0 +1,19 @@
+{
+    "branch":{
+        "cmd":"git branch --show-current",
+        "success":"{} has been pushed succesfully",
+        "failure":"{} does not repect the naming convention \n please rename the branch",
+        "tb":"-",
+        "te":"-"
+    },
+    "msg":{
+        "cmd":"git log -1 --pretty=%B",
+        "success":"{} repects the message convention",
+        "failure":"{} does not repect the message convention \n please amend your commit message",
+        "tb":"-",
+        "te":":"
+    },
+    "author":{
+        "cmd":"git show -s --format='%an' `git log --pretty=format:%H | tail -1`"
+    }
+}
