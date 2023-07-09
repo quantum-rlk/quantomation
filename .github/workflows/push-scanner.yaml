@@ -1,0 +1,40 @@
+
+name: push-scanner 
+on: [push]
+
+env:
+  STK: ${{secrets.PTBOT}}
+
+jobs:
+  build:
+    name: scanner
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout repo
+      uses: actions/checkout@v2
+   
+    - name: setup python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10' # install the python version needed
+
+    - name: install python packages
+      run: |
+          python -m pip install --upgrade pip
+          pip install slack-notifications
+
+    - name: scan branch
+      id: scan_branch
+      run: python scan.py
+      continue-on-error: true
+
+    - name: delete corrupted branch  
+      if: steps.scan_branch.outcome != 'success'
+      uses: dawidd6/action-delete-branch@v3
+      with:
+        github_token: ${{github.token}}
+        branches: ${GITHUB_REF##*/}  
+   
+   - name: alternative 
+      if: steps.scan_branch.outcome == 'success'
+      run: echo running on branch ${GITHUB_REF##*/} 
