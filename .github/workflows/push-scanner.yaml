@@ -28,13 +28,33 @@ jobs:
       run: python scan.py
       continue-on-error: true
 
-    - name: delete corrupted branch  
+    - name: scan cond
       if: steps.scan_branch.outcome != 'success'
-      uses: dawidd6/action-delete-branch@v3
-      with:
-        github_token: ${{github.token}}
-        branches: ${GITHUB_REF##*/}  
-   
-   - name: alternative 
+      run: echo 'error detected in branch'
+
+    - name: alternative 
       if: steps.scan_branch.outcome == 'success'
-      run: echo running on branch ${GITHUB_REF##*/} 
+      run: echo running on branch ${GITHUB_REF##*/}
+
+  merge:
+    needs: build
+    name: decoy
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout repo
+      uses: actions/checkout@v2
+    
+    - name: checkout main    
+      uses: actions/checkout@v3
+      with:
+        ref: main 
+    
+    - name: branch creator 
+      uses: peterjgrainger/action-create-branch@v2.2.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.AUTO_TOKEN }}
+      with:
+        branch: 'dev'
+    
+    - name: displayer
+      run: echo "to oblivion"
